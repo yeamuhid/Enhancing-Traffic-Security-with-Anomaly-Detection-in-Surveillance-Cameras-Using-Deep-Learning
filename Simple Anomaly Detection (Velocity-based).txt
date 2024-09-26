@@ -1,0 +1,31 @@
+import numpy as np
+from sklearn.ensemble import IsolationForest
+
+# Function to calculate the speed of tracked objects
+def calculate_speed(tracked_object_positions):
+    speeds = []
+    for i in range(1, len(tracked_object_positions)):
+        dist = np.linalg.norm(tracked_object_positions[i] - tracked_object_positions[i-1])
+        speeds.append(dist)
+    return speeds
+
+# Example tracked positions (in a real case, you'd use an object tracking algorithm like SORT or Deep SORT)
+tracked_object_positions = [
+    np.array([100, 200]), np.array([110, 210]), np.array([120, 215]), np.array([130, 220]), np.array([500, 600])
+]
+
+# Calculate speed
+speeds = calculate_speed(tracked_object_positions)
+
+# Convert to numpy array for anomaly detection
+speeds = np.array(speeds).reshape(-1, 1)
+
+# Use Isolation Forest for anomaly detection
+clf = IsolationForest(contamination=0.1)
+clf.fit(speeds)
+anomalies = clf.predict(speeds)
+
+# Analyze the results
+for idx, anomaly in enumerate(anomalies):
+    if anomaly == -1:
+        print(f"Anomaly detected at position {tracked_object_positions[idx + 1]} with speed {speeds[idx][0]}")

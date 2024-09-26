@@ -1,0 +1,28 @@
+import torch
+import cv2
+
+# Load YOLOv5 model (you can choose the pre-trained model version: yolov5s, yolov5m, yolov5l, yolov5x)
+model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
+
+# Initialize video capture
+cap = cv2.VideoCapture('traffic_footage.mp4')
+
+while cap.isOpened():
+    ret, frame = cap.read()
+    if not ret:
+        break
+
+    # Perform object detection
+    results = model(frame)
+
+    # Display detected objects
+    frame_with_boxes = results.render()  # Render bounding boxes and labels on the frame
+    cv2.imshow('Traffic Surveillance', frame_with_boxes[0])
+
+    # Break the loop if 'q' is pressed
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+# Release resources
+cap.release()
+cv2.destroyAllWindows()
